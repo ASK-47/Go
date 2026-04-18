@@ -1,0 +1,233 @@
+import (
+	"errors"
+	"fmt"
+	"sync"
+)
+
+var pi float64 = 3.1415
+
+func square(r *int) float64 {
+	*r *= 2
+	return pi * float64(*r) * float64(*r)
+}
+
+type Data struct {
+	name string
+	age  int
+}
+
+func print(d *Data) {
+	fmt.Println("Printing...\n", "Name", d.name, "\t", "Age", d.age)
+}
+
+func (d *Data) set(s string, a int) {
+	d.name = s
+	d.age = a
+}
+
+func set(d *Data, s string, a int) {
+	d.name = s
+	d.age = a
+}
+
+func (d Data) print() {
+	fmt.Println("Printing...\n", "Name", d.name, "\t", "Age", d.age)
+}
+
+// Errors
+
+// Error as variable
+var ErrSomething = errors.New("some error")
+
+type SomeThingError struct {
+	code int
+}
+
+// func Error()
+func (s SomeThingError) Error() string {
+	return fmt.Sprintf("some error [code %d]", s.code)
+}
+
+// getter
+func (s SomeThingError) Code() int {
+	return s.code
+}
+
+// Error Constants
+// user string
+type constStringError string
+
+func (e constStringError) Error() string {
+	return string(e)
+}
+
+const ErrConstSomething constStringError = "some error"
+
+type constIntError int
+
+func (e constIntError) Error() string {
+	return fmt.Sprintf("some error [code %d]", e)
+}
+
+const (
+	ErrFirst constIntError = iota
+	ErrSecond
+)
+
+/*func FirstFunc(n int) error {
+	if n == 1 {
+		return ErrFirst
+	}
+	return SomeThingError{n}
+}
+
+func SecondFunc(n int) error {
+	if err := FirstFunc(n); err != nil {
+		//return fmt.Errorf("can't do it: %w", err)
+		return fmt.Errorf("%w: %w", ErrSecond, err)
+	}
+	return nil
+}*/
+
+var errFirst = errors.New("first error")
+var errSecond = errors.New("second error")
+
+func FirstFunc() error {
+	return fmt.Errorf("error 1: %w", errFirst)
+}
+
+func SecondFunc() error {
+	return fmt.Errorf("error 2: %w", errSecond)
+}
+
+func main() {
+
+	/*if err := FirstFunc(1); err != nil {
+		if err == ErrFirst {
+			fmt.Println("first type error")
+		} else {
+			fmt.Println("error is not of first type")
+		}
+	}*/
+
+	if err := SecondFunc(5); err != nil {
+		//if err == ErrFirst {
+		//if errors.Is(err, ErrFirst) {
+		//var wErr SomeThingError
+		//if errors.As(err, &wErr) {
+		//if errors.As(err, &wErr) && wErr.Code() == 5 {
+		if errors.Is(err, ErrSecond) {
+			//fmt.Println("first type error")
+			fmt.Println("true")
+		} else {
+			//fmt.Println("error is not of first type")
+			fmt.Println("false")
+		}
+	}
+
+	/*defer func() {
+		fmt.Println("Bottom of the Stack!!!")
+	}()
+
+	fmt.Println("Top of the Stack_1!!!")
+	time.Sleep(500 * time.Millisecond)
+	fmt.Println("Top of the Stack_2!!!")
+	time.Sleep(500 * time.Millisecond)
+	fmt.Println("Top of the Stack_3!!!")
+	time.Sleep(500 * time.Millisecond)
+
+	r := 10
+	fmt.Println("r before =", r)
+	pp.Println("r before =", r)
+	r_ptr := &r
+	fmt.Println(square(r_ptr))
+	time.Sleep(500 * time.Millisecond)
+	fmt.Println("r after =", r)
+	pp.Println("r after =", r)
+
+	var d Data = Data{"Andrey", 45}
+	fmt.Println(d.name, "\t", d.age)
+
+	print(&d)
+	set(&d, "Sergey", 10500)
+	print(&d)
+
+	d.set("Ivan", 42)
+	d.print()
+
+	time.Sleep(500 * time.Millisecond)
+	greeting.Hello()
+	time.Sleep(500 * time.Millisecond)
+	greeting.Fuck()
+	time.Sleep(500 * time.Millisecond)
+
+	u := user.User{
+		Name: "Anya",
+		Age:  16,
+	}
+	u.Name = "Vasya"
+
+	fmt.Println(u.Name, "\t", u.Age)
+	pp.Println(u)
+
+	pp.Println(d)
+
+	arr := []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+
+	for i := 0; i < len(arr); i++ {
+		fmt.Print("arr[", i, "]=", i*i, "\n")
+	}
+	fmt.Println(arr)
+
+	for i := 0; i < len(arr); i++ {
+		fmt.Printf("arr[%d]=%d\n", i*i, arr[i])
+	}
+	a := &arr
+	fmt.Println(*a)
+
+	for i, v := range arr {
+		fmt.Println(i, v)
+	}
+
+	for i, v := range "aa,lmkjbaalbalna" {
+		fmt.Printf("%d -%c\n", i, v)
+	}
+
+	fmt.Println("length=", len(arr), "capcity=", cap(arr))
+	arr = append(arr, 10500, 10200)
+	fmt.Println("length=", len(arr), "capcity=", cap(arr))
+	fmt.Printf("arr: %v\n", arr)
+	*/
+
+	errs := make([]error, 0, 2)
+	mx := sync.Mutex{}
+	wg := sync.WaitGroup{}
+
+	wg.Add(2)
+
+	go func() {
+		defer wg.Done()
+
+		mx.Lock()
+		errs = append(errs, FirstFunc())
+		mx.Unlock()
+	}()
+
+	go func() {
+		defer wg.Done()
+
+		mx.Lock()
+		errs = append(errs, SecondFunc())
+		mx.Unlock()
+	}()
+
+	wg.Wait()
+
+	err := errors.Join(errs...)
+
+	if errors.Is(err, errfirst) {
+		fmt.Println("something text")
+	}
+
+	fmt.Println(err.Error())
+}
