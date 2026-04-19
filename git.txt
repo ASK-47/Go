@@ -96,6 +96,9 @@ git branch new branch
 
 //show branch
 git branch
+
+//delete branch
+git branch -D new branch
 ====================================================================================================================================================================================================
 SWITCH - switch to "new branch"
 git checkout new branch
