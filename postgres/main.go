@@ -63,4 +63,12 @@ func main() {
 	//fmt.Println(tasks)
 
 	fmt.Println("Table was successfully created")
+
+	/*val := os.Getenv("phone_number")
+	if val != "" {
+		fmt.Println("val=", val)
+
+	} else {
+		fmt.Println("variable is not initiated")
+	}*/
 }
