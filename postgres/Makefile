@@ -4,6 +4,12 @@ export
 service-run:	
 	go run .
 
+service-deploy:
+	doker compose up -d application
+
+service-undeploy:	
+	doker compose down application
+
 some-target:
 	export env_var=hello && printenv env_var
 
