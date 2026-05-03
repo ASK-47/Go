@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"os/signal"
@@ -8,15 +9,27 @@ import (
 	"time"
 )
 
+func job(ctx context.Context) {
+	i := 1
+	for {
+		select {
+		case <-ctx.Done():
+			fmt.Println("JOB is done")
+			return
+		case <-time.After(1 * time.Second):
+			fmt.Println("JOB is progress i=", i)
+			i++
+		}
+	}
+}
+
 func main() {
 	fmt.Println("PID:", os.Getpid())
-	sigchan := make(chan os.Signal, 1)
-	signal.Notify(sigchan, syscall.SIGTERM)
-	go func() {
-		for {
-			s := <-sigchan
-			fmt.Println("got system signal:", s)
-		}
-	}()
-	time.Sleep(1 * time.Hour)
+
+	ctx, _ := signal.NotifyContext(context.Background(), syscall.SIGTERM)
+
+	job(ctx)
+
+	fmt.Println("Application is stopped by SIGTERM")
+
 }
