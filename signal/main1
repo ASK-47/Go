@@ -1,0 +1,59 @@
+package main
+
+import (
+	"context"
+	"fmt"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
+)
+
+func main() {
+	fmt.Println("PID:", os.Getpid())
+
+	//1 SIG treatment
+	/*sigchan1 := make(chan os.Signal, 1)
+	signal.Notify(sigchan1, syscall.SIGTERM)
+
+	sigchan2 := make(chan os.Signal, 1)
+	signal.Notify(sigchan2, syscall.SIGINT)
+
+	// kill -SIGTERM PID (stop and exit),  kill -SIGINT PID (Ctrl+C, inmmed stop),  SIGKILL==terminate
+	go func() {
+		for {
+			s := <-sigchan1
+			fmt.Println("got SIGTERM system signal:", s)
+		}
+	}()
+
+	go func() {
+		for {
+			s := <-sigchan2
+			fmt.Println("got SIGINT system signal:", s)
+		}
+	}()*/
+
+	//2 SIG treatment
+	/*_, cancel := context.WithCancel(context.Background())
+
+	sigchan := make(chan os.Signal, 1)
+	signal.Notify(sigchan, syscall.SIGTERM)
+
+	go func() {
+		<-sigchan
+		cancel()
+	}()*/
+
+	//3 SIG treatment
+
+	ctx, _ := signal.NotifyContext(context.Background(), syscall.SIGTERM)
+
+	go func() {
+		fmt.Println("Before context cancel")
+		<-ctx.Done()
+		fmt.Println("After context cancel")
+	}()
+
+	time.Sleep(1 * time.Hour)
+}

@@ -1,0 +1,8 @@
+2026-05-01T17:34:26.747427	DEBUG	logging/main.go:75	Debug logging	{"time_field": "2026-05-01T14:34:26.747427"}
+2026-05-01T17:34:26.771593	INFO	logging/main.go:76	Some Info log	{"int_field": 3}
+2026-05-01T17:34:26.771593	WARN	logging/main.go:77	Warning logging	{"float_field": 5.25}
+2026-05-01T17:34:26.771593	ERROR	logging/main.go:78	Some Error logging	{"error": "TEST ERROR"}
+main.main
+	G:/Go/logging/main.go:78
+runtime.main
+	C:/Program Files/Go/src/runtime/proc.go:290
